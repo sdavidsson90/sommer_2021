@@ -494,6 +494,9 @@ system.time(full_data2 <- dbGetQuery(donorsChoose, 'SELECT * FROM donation a
           LEFT JOIN schools d ON a.school_id = d.school_id
           LEFT JOIN teachers e ON a.teacher_id = e.teacher_id;
            '))
+
+dbDisconnect(donorsChoose)
+
 # I SQL joinet beholder man alle kolonner fra alle tabeller, derfor er der
 # dubletter af alle kolonner som er brugt i vores joins, dem sorterer vi fra ved
 # at lave en vektor med unikke kolonne navne
@@ -519,8 +522,6 @@ donorsChoose <- dbConnect(RSQLite::SQLite(), "SQLdatabase/donorsChoose.sqlite")
 
 # Vi tilføjer full data til tabellen
 dbWriteTable(donorsChoose,"full_data",full_data, overwrite = T)
-
-
 
 dbDisconnect(donorsChoose)
 
