@@ -2,7 +2,7 @@ pacman::p_load(readr,tidyverse,RSQLite,utils,waldo,
                svDialogs,DescTools,zoo,textclean)
 
 # Denne fil skal køres umiddelbart efter data_load og med de variabler 
-# der er i global environment efter data_load.R har kørt
+# der er i global environment efter data_load.R har kørt. tager ca. 800 sekunder
 
 rm(list = ls()[ls() != "full_data"])
 
@@ -329,6 +329,13 @@ sum(complete.cases(final_data_1))
 sum(complete.cases(final_data_2))
 
 
+donorsChoose <- dbConnect(RSQLite::SQLite(), "SQLdatabase/donorsChoose.sqlite")
+
+# Vi tilføjer disse 2 vigtige tabeller til sql databasen
+dbWriteTable(donorsChoose,"final_data_1",final_data_1, overwrite = T)
+dbWriteTable(donorsChoose,"final_data_2",final_data_2, overwrite = T)
+
+dbDisconnect(donorsChoose)
 
 
 
