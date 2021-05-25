@@ -4,7 +4,7 @@ pacman::p_load(readr,tidyverse,RSQLite,utils,waldo,
 # Denne fil skal køres umiddelbart efter data_load og med de variabler 
 # der er i global environment efter data_load.R har kørt
 
-
+rm(list = ls()[ls() != "full_data"])
 
 # Vi tjekker om full_data er tilstede i vores envionment, 
 # hvis ikke henter vi den via SQL
@@ -13,6 +13,7 @@ if (!exists("full_data")) {
   full_data <- dbGetQuery(donorsChoose, 'SELECT * FROM full_data')
   dbDisconnect(donorsChoose)
 }
+
 
 
 # Der kan være flere forskellige donation_ids vedr. samme donor/projekt på
