@@ -3,7 +3,7 @@ pacman::p_load(readr,tidyverse,RSQLite,utils,waldo,
 
 if (!exists("final_data_2")) {
   donorsChoose <- dbConnect(RSQLite::SQLite(), "SQLdatabase/donorsChoose.sqlite")
-  full_data <- dbGetQuery(donorsChoose, 'SELECT * FROM final_data_2')
+  final_data_2 <- dbGetQuery(donorsChoose, 'SELECT * FROM final_data_2')
   dbDisconnect(donorsChoose)
 }
 
