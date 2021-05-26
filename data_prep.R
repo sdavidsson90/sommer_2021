@@ -153,150 +153,127 @@ donors_first_donation_data_multi <- donors_first_donation_date_full %>%
 
 
 
+# Vi laver en funktion der skal bruges når vi samler vores data pr. donor.
+# Hvis en donor har doneret til flere projekter på første dage. Finder vi den 
+# oftest fremkommende værdi i kolonnen, hvis der 2 eller flere der optræder
+# flest gange eller Mode() returnerer NA, skriver vi NA, ellers skriver vi mode
+mode_test <- function(x) {
+  ifelse(length(Mode(x)) > 1 | 
+           is.na(Mode(x)[1]),NA,
+         Mode(x))
+}
+
+# Vi laver en liste over de variabler vi ikke vil køre igennem vores funktioner
+variabler = c("donor_id","more_donations","n_projects_donated_first",
+         "project_id","donation_included_optional_donation",
+         "donation_amount")
+
+
 # Vi summerer al vores data pr. donor på den første donations dag for donorer 
-# med mere end 1 donation på første dag. Vi bruger Mode på de fleste kolonner
-# til at få den oftest forekommende værdi på alle kolonner, hvis Mode() returnerer
-# mere end 1 værdi eller der er NA værdi i en af rækkerne, skriver vi NA, men ellers
-# får vi den oftest forekommende værdi. Udover mode tæller vi antallet af 
-# unikke værdier(n_distinct) for hver kolonne
+# med mere end 1 donation på første dag.
   donors_first_donation_data_multi_group <- donors_first_donation_data_multi %>% 
-    filter(n_projects_donated_first > 1 ) %>% 
-  group_by(donor_id) %>% 
-  mutate(   donation_date = as.Date(mean(doation_date)),
-            more_donations = mean(more_donations),
-            n_projects_donated_first = mean(n_projects_donated_first),
-            donation_included_optional_donation = ifelse(is.na(Mode(donation_included_optional_donation)[1]),NA,Mode(donation_included_optional_donation)),
-            donation_amount = max(ifelse(is.na(donation_amount), 0, donation_amount)),
-            donation_amount_total = sum(donation_amount, na.rm = TRUE),
-            school_id = ifelse(length(Mode(school_id)) > 1 | is.na(Mode(school_id)[1]),NA,Mode(school_id)),
-            n_school_id = n_distinct(school_id),
-            teacher_id = ifelse(length(Mode(teacher_id)) > 1 | is.na(Mode(teacher_id)[1]),NA,Mode(teacher_id)),
-            n_teacher_id = n_distinct(teacher_id),
-            teacher_project_posted_sequence = ifelse(length(Mode(teacher_project_posted_sequence)) > 1 | is.na(Mode(teacher_project_posted_sequence)[1]),NA,Mode(teacher_project_posted_sequence)),
-            n_teacher_project_posted_sequence = n_distinct(teacher_project_posted_sequence),
-            project_type = ifelse(length(Mode(project_type)) > 1 | is.na(Mode(project_type)[1]),NA,Mode(project_type)),
-            n_project_type = n_distinct(project_type),
-            project_title = ifelse(length(Mode(project_title)) > 1 | is.na(Mode(project_title)[1]),NA,Mode(project_title)),
-            n_project_title = n_distinct(project_title),
-            project_subject_category_tree = ifelse(length(Mode(project_subject_category_tree)) > 1 | is.na(Mode(project_subject_category_tree)[1]),NA,Mode(project_subject_category_tree)),
-            n_project_subject_category_tree = n_distinct(project_subject_category_tree),
-            project_subject_subcategory_tree = ifelse(length(Mode(project_subject_subcategory_tree)) > 1 | is.na(Mode(project_subject_subcategory_tree)[1]),NA,Mode(project_subject_subcategory_tree)),
-            n_project_subject_subcategory_tree = n_distinct(project_subject_subcategory_tree),
-            project_grade_level_category = ifelse(length(Mode(project_grade_level_category)) > 1 | is.na(Mode(project_grade_level_category)[1]),NA,Mode(project_grade_level_category)),
-            n_project_grade_level_category = n_distinct(project_grade_level_category),
-            project_resource_category = ifelse(length(Mode(project_resource_category)) > 1 | is.na(Mode(project_resource_category)[1]),NA,Mode(project_resource_category)),
-            n_project_resource_category = n_distinct(project_resource_category),
-            project_cost = ifelse(length(Mode(project_cost)) > 1 | is.na(Mode(project_cost)[1]),NA,Mode(project_cost)),
-            n_project_cost = n_distinct(project_cost),
-            project_current_status = ifelse(length(Mode(project_current_status)) > 1 | is.na(Mode(project_current_status)[1]),NA,Mode(project_current_status)),
-            n_project_current_status = n_distinct(project_current_status),
-            project_fully_funded_date = ifelse(length(Mode(project_fully_funded_date)) > 1 | is.na(Mode(project_fully_funded_date)[1]),NA,Mode(project_fully_funded_date)),
-            n_project_fully_funded_date = n_distinct(project_fully_funded_date),
-            donor_city = ifelse(length(Mode(donor_city)) > 1 | is.na(Mode(donor_city)[1]),NA,Mode(donor_city)),
-            n_donor_city = n_distinct(donor_city),
-            donor_state = ifelse(length(Mode(donor_state)) > 1 | is.na(Mode(donor_state)[1]),NA,Mode(donor_state)),
-            n_donor_state = n_distinct(donor_state),
-            donor_is_teacher = ifelse(length(Mode(donor_is_teacher)) > 1 | is.na(Mode(donor_is_teacher)[1]),NA,Mode(donor_is_teacher)),
-            n_donor_is_teacher = n_distinct(donor_is_teacher),
-            donor_zip = ifelse(length(Mode(donor_zip)) > 1 | is.na(Mode(donor_zip)[1]),NA,Mode(donor_zip)),
-            n_donor_zip = n_distinct(donor_zip),
-            project_posted_date = ifelse(length(Mode(project_posted_date)) > 1 | is.na(Mode(project_posted_date)[1]),NA,Mode(project_posted_date)),
-            n_project_posted_date = n_distinct(project_posted_date),
-            school_name = ifelse(length(Mode(school_name)) > 1 | is.na(Mode(school_name)[1]),NA,Mode(school_name)),
-            n_school_name = n_distinct(school_name),
-            school_metro_type = ifelse(length(Mode(school_metro_type)) > 1 | is.na(Mode(school_metro_type)[1]),NA,Mode(school_metro_type)),
-            n_school_metro_type = n_distinct(school_metro_type),
-            school_percentage_free_lunch = ifelse(length(Mode(school_percentage_free_lunch)) > 1 | is.na(Mode(school_percentage_free_lunch)[1]),NA,Mode(school_percentage_free_lunch)),
-            n_school_percentage_free_lunch = n_distinct(school_percentage_free_lunch),
-            school_state = ifelse(length(Mode(school_state)) > 1 | is.na(Mode(school_state)[1]),NA,Mode(school_state)),
-            n_school_state = n_distinct(school_state),
-            school_zip = ifelse(length(Mode(school_zip)) > 1 | is.na(Mode(school_zip)[1]),NA,Mode(school_zip)),
-            n_school_zip = n_distinct(school_zip),
-            school_city = ifelse(length(Mode(school_city)) > 1 | is.na(Mode(school_city)[1]),NA,Mode(school_city)),
-            n_school_city = n_distinct(school_city),
-            school_county = ifelse(length(Mode(school_county)) > 1 | is.na(Mode(school_county)[1]),NA,Mode(school_county)),
-            n_school_county = n_distinct(school_county),
-            school_district = ifelse(length(Mode(school_district)) > 1 | is.na(Mode(school_district)[1]),NA,Mode(school_district)),
-            n_school_district = n_distinct(school_district),
-            teacher_prefix = ifelse(length(Mode(teacher_prefix)) > 1 | is.na(Mode(teacher_prefix)[1]),NA,Mode(teacher_prefix)),
-            n_teacher_prefix = n_distinct(teacher_prefix),
-            teacher_first_project_posted_date = ifelse(length(Mode(teacher_first_project_posted_date)) > 1 | is.na(Mode(teacher_first_project_posted_date)[1]),NA,Mode(teacher_first_project_posted_date)),
-            n_teacher_first_project_posted_date = n_distinct(teacher_first_project_posted_date)
-         
-            ) %>% 
-  slice(1) %>% 
-  ungroup()
+    
+    # Vi tager kun donorer der har doneret til mere end 1 projekt på første
+    # dag og senere kobler vi disse sammen med donorer der kun har doneret til 
+    # 1 projekt på første donationsdag.
+    filter(n_projects_donated_first>1) %>% 
+    
+    group_by(donor_id) %>% 
+    
+    # Vi ændrer alle variabler undtagen de ovenfor definerede variabler
+    mutate_at(vars(-variabler),
+    
+    # Hver af de valgte variabler udsættes for hhv. vores egen mode_test
+    # og n_destinct som tæller antal unikke værdier
+                  list(mode = mode_test,ndist = n_distinct)) %>%
+    
+    # Vi vælger kun de kolonner der er genereret af vores 2 ovenstående
+    # funktioner og kolonnerne fra variabler
+    select(ends_with("_mode"),ends_with("_ndist"),variabler) %>% 
+    
+    # Vi fjerner _mode fra variabel navnene, så de er får de originale navne
+    rename_with(~ gsub("_mode", "", .x, fixed = TRUE), ends_with("mode")) %>% 
+    
+    # Vi sætter n_ foran variabler der slutter med _ndist
+    rename_with(~ paste0("n_",.x), ends_with("_ndist")) %>%
+    
+    # Vi fjerner _ndist fra variabel navnene
+    rename_with(~ gsub("_ndist", "", .x, fixed = TRUE), ends_with("_ndist")) %>% 
+    
+    mutate(
+      # Laver et dato felt - da alle datoer pr. donor er på samme dag, 
+      # bruger vi mean(gennemsnit)
+      donation_date = as.Date(mean(doation_date)),
+      
+      # Vores true/false, igen har alle rækker pr. donor samme værdi
+      # derfor bruger vi gennemsnit
+      more_donations = mean(more_donations),
+      
+      # som ovenfor
+      n_projects_donated_first = mean(n_projects_donated_first),
+      
+      donation_included_optional_donation = ifelse(is.na(Mode(donation_included_optional_donation)[1]),NA,Mode(donation_included_optional_donation)),
+      
+      # Hvad er den højeste donation, hvis der er lavet flere på første dag.
+      donation_amount = max(ifelse(is.na(donation_amount), 0, donation_amount)),
+      
+      # Total sum doneret første dag.
+      donation_amount_total = sum(donation_amount, na.rm = TRUE),
+    ) %>% 
+    select(-n_doation_date) %>% 
+    slice(1) %>% 
+    ungroup()
   
-
-
+  # vi laver en funktion der sender 1 retur og 1 der sender inputtet
+  # retur, så vi kan bruge disse i stedet for vores n_distinct og mode_test
+  # Disse skal bruges på de data hvor donor_id kun optræder på 1 projekt på 
+  # første donations dag.
+  returner_1 <- function(x) 1
+  returner_x <- function(x) x
+  
+    
+ 
 # Her tager vi fat i alle donorer med 1 donation på første dag, vi sørger for at 
 # oprette de samme variabler som oven for, her skal der heldig vis ikke bruges
 # hverken Mode() eller n_distinct(), da vi ved der kun er 1 værdi pr. donor,
 # og vi derfor bare kan 1 alle kolonner med n_ prefix.
-donors_first_donation_data_multi_single <- donors_first_donation_data_multi %>% 
-  filter(n_projects_donated_first==1) %>% 
-  mutate(donor_id = donor_id,
-         donation_date = as.Date(doation_date),
-         more_donations = mean(more_donations),
-         n_projects_donated_first = n_projects_donated_first,
-         donation_included_optional_donation = donation_included_optional_donation,
-         donation_amount = donation_amount,
-         donation_amount_total = donation_amount,
-         school_id = school_id,
-         n_school_id = 1,
-         teacher_id = teacher_id,
-         n_teacher_id = 1,
-         teacher_project_posted_sequence = teacher_project_posted_sequence,
-         n_teacher_project_posted_sequence = 1,
-         project_type = project_type,
-         n_project_type = 1,
-         project_title = project_title,
-         n_project_title = 1,
-         project_subject_category_tree = project_subject_category_tree,
-         n_project_subject_category_tree = 1,
-         project_subject_subcategory_tree = project_subject_subcategory_tree,
-         n_project_subject_subcategory_tree = 1,
-         project_grade_level_category = project_grade_level_category,
-         n_project_grade_level_category = 1,
-         project_resource_category = project_resource_category,
-         n_project_resource_category = 1,
-         project_cost = project_cost,
-         n_project_cost = 1,
-         project_current_status = project_current_status,
-         n_project_current_status = 1,
-         project_fully_funded_date = project_fully_funded_date,
-         n_project_fully_funded_date = 1,
-         donor_city = donor_city,
-         n_donor_city = 1,
-         donor_state = donor_state,
-         n_donor_state = 1,
-         donor_is_teacher = donor_is_teacher,
-         n_donor_is_teacher = 1,
-         donor_zip = donor_zip,
-         n_donor_zip = 1,
-         project_posted_date = project_posted_date,
-         n_project_posted_date = 1,
-         school_name = school_name,
-         n_school_name = 1,
-         school_metro_type = school_metro_type,
-         n_school_metro_type = 1,
-         school_percentage_free_lunch = school_percentage_free_lunch,
-         n_school_percentage_free_lunch = 1,
-         school_state = school_state,
-         n_school_state = 1,
-         school_zip = school_zip,
-         n_school_zip = 1,
-         school_city = school_city,
-         n_school_city = 1,
-         school_county = school_county,
-         n_school_county = 1,
-         school_district = school_district,
-         n_school_district = 1,
-         teacher_prefix = teacher_prefix,
-         n_teacher_prefix = 1,
-         teacher_first_project_posted_date = teacher_first_project_posted_date,
-         n_teacher_first_project_posted_date = 1
-  )
+  donors_first_donation_data_multi_single <- donors_first_donation_data_multi %>% 
+    filter(n_projects_donated_first==1) %>% 
+    
+    mutate_at(vars(-variabler),
+              
+              # Hver af de valgte variabler udsættes for hhv. vores egen mode_test
+              # og n_destinct som tæller antal unikke værdier
+              list(mode = returner_x,ndist = returner_1)) %>%
+    
+    # Vi vælger kun de kolonner der er genereret af vores 2 ovenstående
+    # funktioner og kolonnerne fra variabler
+    select(ends_with("_mode"),ends_with("_ndist"),variabler) %>% 
+    
+    # Vi fjerner _mode fra variabel navnene, så de er får de originale navne
+    rename_with(~ gsub("_mode", "", .x, fixed = TRUE), ends_with("mode")) %>% 
+    
+    # Vi sætter n_ foran variabler der slutter med _ndist
+    rename_with(~ paste0("n_",.x), ends_with("_ndist")) %>%
+    
+    # Vi fjerner _ndist fra variabel navnene
+    rename_with(~ gsub("_ndist", "", .x, fixed = TRUE), ends_with("_ndist")) %>%  
+    
+    mutate(
+      # bruger vi mean(gennemsnit)
+      donation_date = as.Date(doation_date),
+      
+      
+      
+      # Total sum doneret første dag.
+      donation_amount_total = sum(donation_amount, na.rm = TRUE)
+    ) %>% 
+    select(-n_doation_date)  
+  
+  
+  
+  
+  
   
 
 
@@ -307,9 +284,13 @@ antal_forskellige_donorer == (nrow(donors_first_donation_data_multi_single) + nr
 waldo::compare(names(donors_first_donation_data_multi_single), names(donors_first_donation_data_multi_group))
 
 
+# Data der indholder summeret data for første donations dag pr. donor
 final_data_1 <- 
   rbind(donors_first_donation_data_multi_single,donors_first_donation_data_multi_group)
              
+# Data der indholder data for første donations dag pr. donor, projekt data er
+#  fra det project donoren donerede mest til, hvis donoren har doneret til 
+# flere projekter på deres første donationsdag
 final_data_2 <- donors_first_donation_data_multi %>% 
   filter(n_projects_donated_first > 1) %>% 
   arrange(donor_id, desc(donation_amount)) %>% 
